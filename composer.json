@@ -1,0 +1,54 @@
+{
+    "name": "lbausch/build-metadata-laravel",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lorenz Bausch",
+            "email": "info@lorenzbausch.de"
+        }
+    ],
+    "require": {
+        "php": "^8.1.11",
+        "illuminate/cache": "^9.36",
+        "illuminate/support": "^9.36",
+        "nesbot/carbon": "^2.62"
+    },
+    "require-dev": {
+        "bamarni/composer-bin-plugin": "^1.8",
+        "orchestra/testbench": "^7.11",
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lbausch\\BuildMetadataLaravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php ./vendor/bin/testbench package:discover --ansi"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "bamarni/composer-bin-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+            ]
+        },
+        "bamarni-bin": {
+            "bin-links": false,
+            "target-directory": "vendor-bin",
+            "forward-command": true
+        }
+    }
+}
