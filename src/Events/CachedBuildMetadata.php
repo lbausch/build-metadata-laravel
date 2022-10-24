@@ -2,6 +2,7 @@
 
 namespace Lbausch\BuildMetadataLaravel\Events;
 
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -28,7 +29,7 @@ class CachedBuildMetadata
     /**
      * Get the channels the event should broadcast on.
      */
-    public function broadcastOn(): \Illuminate\Broadcasting\Channel|array
+    public function broadcastOn(): Channel|array
     {
         return [];
     }
