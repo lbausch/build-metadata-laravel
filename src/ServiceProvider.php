@@ -2,6 +2,7 @@
 
 namespace Lbausch\BuildMetadataLaravel;
 
+use ErrorException;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -50,8 +51,9 @@ class ServiceProvider extends BaseServiceProvider
     /**
      * Cache build metadata.
      *
-     * @throws InvalidArgumentException
+     * @throws ErrorException
      * @throws FileNotFoundException
+     * @throws InvalidArgumentException
      */
     protected function cacheBuildMetadata(string $file): void
     {
@@ -84,6 +86,11 @@ class ServiceProvider extends BaseServiceProvider
 
         // Read build metadata
         $metadata_raw = file_get_contents($file);
+
+        // Verify build metadata were read correctly
+        if (false === $metadata_raw) {
+            throw new ErrorException('Failed to read build metadata from '.$file);
+        }
 
         // Try to parse JSON
         $metadata = json_decode($metadata_raw, $associative = true, 512, JSON_THROW_ON_ERROR);
