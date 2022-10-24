@@ -2,18 +2,18 @@
 
 namespace Lbausch\BuildMetadataLaravel;
 
-use Carbon\Carbon;
-use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use InvalidArgumentException;
 
 class ServiceProvider extends BaseServiceProvider
 {
-    final public const BUILD_REF_FILE = 'BUILD_REF';
-    final public const BUILD_REF_CACHE_KEY = 'BUILD_REF';
-
-    final public const BUILD_DATE_FILE = 'BUILD_REF';
-    final public const BUILD_DATE_CACHE_KEY = 'BUILD_REF';
+    /**
+     * Cache repository.
+     */
+    protected Repository $cache;
 
     /**
      * Register services.
@@ -38,26 +38,45 @@ class ServiceProvider extends BaseServiceProvider
             __DIR__.'/../config/build-metadata.php' => config_path('build-metadata.php'),
         ]);
 
-        $cache = $cacheManager->store(config('build-metadata.cache.store'));
+        // Obtain a cache store instance
+        $this->cache = $cacheManager->store(config('build-metadata.cache.store'));
 
-        // Cache build reference
-        if (!$cache->has(static::BUILD_REF_CACHE_KEY) && file_exists(base_path(static::BUILD_REF_FILE))) {
-            $build_ref = trim(file_get_contents(base_path(static::BUILD_REF_FILE)));
+        // Cache build metadata
+        $this->cacheBuildMetadata(config('build-metadata.file'));
+    }
 
-            $cache->forever(static::BUILD_REF_CACHE_KEY, $build_ref);
+    /**
+     * Cache build metadata.
+     *
+     * @throws InvalidArgumentException
+     * @throws FileNotFoundException
+     */
+    protected function cacheBuildMetadata(string $file): void
+    {
+        // Verify a cache key is configured
+        $cache_key = trim(config('build-metadata.cache.key'));
+
+        if (!$cache_key) {
+            throw new InvalidArgumentException('Invalid cache key "'.$cache_key.'" provided');
         }
 
-        // Cache build date
-        if (!$cache->has(static::BUILD_DATE_CACHE_KEY) && file_exists(base_path(static::BUILD_DATE_FILE))) {
-            $build_date = trim(file_get_contents(base_path(static::BUILD_DATE_FILE)));
-
-            try {
-                $build_date = Carbon::createFromTimestamp($build_date, 'UTC');
-            } catch (InvalidFormatException) {
-                $build_date = null;
-            }
-
-            $cache->forever(static::BUILD_DATE_CACHE_KEY, $build_date);
+        // Avoid re-caching metadata
+        if ($this->cache->has($cache_key)) {
+            return;
         }
+
+        // Verify build metadata file exists
+        if (!file_exists($file)) {
+            throw new FileNotFoundException('File containing build metadata "'.$file.'" not found');
+        }
+
+        // Read build metadata
+        $metadata_raw = file_get_contents($file);
+
+        // Try to parse JSON
+        $metadata = json_decode($metadata_raw, $associative = true, 512, JSON_THROW_ON_ERROR);
+
+        // Cache build metadata forever
+        $this->cache->forever($cache_key, $metadata);
     }
 }

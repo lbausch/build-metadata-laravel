@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.1.11",
         "illuminate/cache": "^9.36",
+        "illuminate/contracts": "^9.36",
         "illuminate/support": "^9.36",
         "nesbot/carbon": "^2.62"
     },
