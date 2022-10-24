@@ -45,7 +45,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->cache = $cacheManager->store(config('build-metadata.cache.store'));
 
         // Cache build metadata
-        $this->cacheBuildMetadata(config('build-metadata.file'));
+        $this->cacheBuildMetadata();
     }
 
     /**
@@ -55,7 +55,7 @@ class ServiceProvider extends BaseServiceProvider
      * @throws FileNotFoundException
      * @throws InvalidArgumentException
      */
-    protected function cacheBuildMetadata(string $file): void
+    protected function cacheBuildMetadata(): void
     {
         // Verify a cache key is configured
         $cache_key = trim((string) config('build-metadata.cache.key'));
@@ -71,6 +71,12 @@ class ServiceProvider extends BaseServiceProvider
             return;
         }
 
+        // Dispatch an event before caching build metadata
+        CachingBuildMetadata::dispatch();
+
+        // Get configured build metadata file
+        $file = config('build-metadata.file');
+
         // Verify build metadata file exists
         if (!file_exists($file)) {
             throw new FileNotFoundException('File containing build metadata "'.$file.'" not found');
@@ -80,9 +86,6 @@ class ServiceProvider extends BaseServiceProvider
         if (!is_readable($file)) {
             throw new FileNotFoundException('File containing build metadata "'.$file.'" is unreadable');
         }
-
-        // Dispatch an event before caching build metadata
-        CachingBuildMetadata::dispatch();
 
         // Read build metadata
         $metadata_raw = file_get_contents($file);
