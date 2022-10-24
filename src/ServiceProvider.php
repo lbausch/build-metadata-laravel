@@ -54,7 +54,7 @@ class ServiceProvider extends BaseServiceProvider
     protected function cacheBuildMetadata(string $file): void
     {
         // Verify a cache key is configured
-        $cache_key = trim(config('build-metadata.cache.key'));
+        $cache_key = trim((string) config('build-metadata.cache.key'));
 
         if (!$cache_key) {
             throw new InvalidArgumentException('Invalid cache key "'.$cache_key.'" provided');
