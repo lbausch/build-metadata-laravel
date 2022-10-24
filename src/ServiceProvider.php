@@ -4,7 +4,7 @@ namespace Lbausch\BuildMetadataLaravel;
 
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
-use Illuminate\Cache\Repository;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
@@ -22,6 +22,9 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/build-metadata.php', 'build-metadata'
+        );
     }
 
     /**
@@ -29,8 +32,14 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
-    public function boot(Repository $cache)
+    public function boot(CacheManager $cacheManager)
     {
+        $this->publishes([
+            __DIR__.'/../config/build-metadata.php' => config_path('build-metadata.php'),
+        ]);
+
+        $cache = $cacheManager->store(config('build-metadata.cache.store'));
+
         // Cache build reference
         if (!$cache->has(static::BUILD_REF_CACHE_KEY) && file_exists(base_path(static::BUILD_REF_FILE))) {
             $build_ref = trim(file_get_contents(base_path(static::BUILD_REF_FILE)));
