@@ -35,8 +35,6 @@ class ServiceProvider extends BaseServiceProvider
         if (!$cache->has(static::BUILD_REF_CACHE_KEY) && file_exists(base_path(static::BUILD_REF_FILE))) {
             $build_ref = trim(file_get_contents(base_path(static::BUILD_REF_FILE)));
 
-            $build_ref = substr($build_ref, 0, 8);
-
             $cache->forever(static::BUILD_REF_CACHE_KEY, $build_ref);
         }
 
