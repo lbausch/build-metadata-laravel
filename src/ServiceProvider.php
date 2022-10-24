@@ -7,6 +7,8 @@ use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use InvalidArgumentException;
+use Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata;
+use Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -60,8 +62,10 @@ class ServiceProvider extends BaseServiceProvider
             throw new InvalidArgumentException('Invalid cache key "'.$cache_key.'" provided');
         }
 
-        // Avoid re-caching metadata
+        // Avoid re-caching build metadata
         if ($this->cache->has($cache_key)) {
+            CachedBuildMetadata::dispatch($this->cache->get($cache_key));
+
             return;
         }
 
@@ -69,6 +73,9 @@ class ServiceProvider extends BaseServiceProvider
         if (!file_exists($file)) {
             throw new FileNotFoundException('File containing build metadata "'.$file.'" not found');
         }
+
+        // Dispatch an event before caching build metadata
+        CachingBuildMetadata::dispatch();
 
         // Read build metadata
         $metadata_raw = file_get_contents($file);
@@ -78,5 +85,8 @@ class ServiceProvider extends BaseServiceProvider
 
         // Cache build metadata forever
         $this->cache->forever($cache_key, $metadata);
+
+        // Dispatch an event after caching build metadata
+        CachedBuildMetadata::dispatch($metadata);
     }
 }
