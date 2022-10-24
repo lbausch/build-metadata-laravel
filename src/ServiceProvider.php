@@ -74,6 +74,11 @@ class ServiceProvider extends BaseServiceProvider
             throw new FileNotFoundException('File containing build metadata "'.$file.'" not found');
         }
 
+        // Verify build metadata file is readable
+        if (!is_readable($file)) {
+            throw new FileNotFoundException('File containing build metadata "'.$file.'" is unreadable');
+        }
+
         // Dispatch an event before caching build metadata
         CachingBuildMetadata::dispatch();
 
