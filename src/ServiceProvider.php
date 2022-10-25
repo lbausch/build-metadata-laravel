@@ -5,7 +5,6 @@ namespace Lbausch\BuildMetadataLaravel;
 use ErrorException;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use InvalidArgumentException;
 use Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata;
@@ -52,7 +51,6 @@ class ServiceProvider extends BaseServiceProvider
      * Cache build metadata.
      *
      * @throws ErrorException
-     * @throws FileNotFoundException
      * @throws InvalidArgumentException
      */
     protected function cacheBuildMetadata(): void
@@ -77,14 +75,9 @@ class ServiceProvider extends BaseServiceProvider
         // Get configured build metadata file
         $file = config('build-metadata.file');
 
-        // Verify build metadata file exists
-        if (!file_exists($file)) {
-            throw new FileNotFoundException('File containing build metadata "'.$file.'" not found');
-        }
-
-        // Verify build metadata file is readable
-        if (!is_readable($file)) {
-            throw new FileNotFoundException('File containing build metadata "'.$file.'" is unreadable');
+        // Verify build metadata file exists and is readable
+        if (!file_exists($file) || !is_readable($file)) {
+            return;
         }
 
         // Read build metadata

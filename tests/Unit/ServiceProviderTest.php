@@ -3,7 +3,6 @@
 namespace Tests\Unit;
 
 use Illuminate\Cache\CacheManager;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Lbausch\BuildMetadataLaravel\ServiceProvider;
 use Tests\TestCase;
 
@@ -32,10 +31,10 @@ final class ConfigTest extends TestCase
     {
         $cacheManager = $this->app->make(CacheManager::class);
 
-        $this->expectException(FileNotFoundException::class);
-
         $service_provider = new ServiceProvider($this->app);
 
         $service_provider->boot($cacheManager);
+
+        $this->assertFalse($cacheManager->store(config('build-metadata.cache.store'))->has(config('build-metadata.cache.key')));
     }
 }
