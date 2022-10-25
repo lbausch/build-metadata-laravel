@@ -44,6 +44,7 @@
     "extra": {
         "laravel": {
             "providers": [
+                "Lbausch\\BuildMetadataLaravel\\ServiceProvider"
             ]
         },
         "bamarni-bin": {
