@@ -13,7 +13,7 @@ return [
         'store' => env('BUILD_METADATA_CACHE_STORE', config('cache.default')),
 
         /*
-         * Cache key to store metadata in.
+         * Cache key for storing metadata.
          */
         'key' => env('BUILD_METADATA_CACHE_KEY', 'BUILD_METADATA'),
     ],
