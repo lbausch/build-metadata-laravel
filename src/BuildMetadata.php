@@ -5,7 +5,6 @@ namespace Lbausch\BuildMetadataLaravel;
 use ErrorException;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata;
 use Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata;
@@ -36,25 +35,9 @@ class BuildMetadata
     /**
      * Get build metadata.
      */
-    public function get(string $key = null, mixed $default = null): mixed
+    public function getMetadata(): ?Metadata
     {
-        $data = $this->cache->get($this->cache_key, []);
-
-        if (null === $key) {
-            return $data;
-        }
-
-        return Arr::get($data, $key, $default);
-    }
-
-    /**
-     * Determine if an item exists in the build metadata.
-     */
-    public function has(string $key): bool
-    {
-        $data = $this->get();
-
-        return Arr::has($data, $key);
+        return $this->cache->get($this->cache_key);
     }
 
     /**
@@ -63,18 +46,16 @@ class BuildMetadata
      * @throws ErrorException
      * @throws InvalidArgumentException
      */
-    public function cache(): void
+    protected function cache(): void
     {
         // Verify a cache key is configured
-        $cache_key = trim((string) $this->config->get('build-metadata.cache.key'));
-
-        if (!$cache_key) {
-            throw new InvalidArgumentException('Invalid cache key "'.$cache_key.'" provided');
+        if (!$this->cache_key) {
+            throw new InvalidArgumentException('Invalid cache key "'.$this->cache_key.'" provided');
         }
 
         // Avoid re-caching build metadata
-        if ($this->cache->has($cache_key)) {
-            CachedBuildMetadata::dispatch($this->cache->get($cache_key));
+        if ($this->cache->has($this->cache_key)) {
+            CachedBuildMetadata::dispatch($this->getMetadata());
 
             return;
         }
@@ -100,10 +81,10 @@ class BuildMetadata
         }
 
         // Try to parse JSON
-        $metadata = json_decode($metadata_raw, $associative = true, 512, JSON_THROW_ON_ERROR);
+        $metadata = Metadata::fromJson($metadata_raw);
 
         // Cache build metadata forever
-        $this->cache->forever($cache_key, $metadata);
+        $this->cache->forever($this->cache_key, $metadata);
 
         // Dispatch an event after caching build metadata
         CachedBuildMetadata::dispatch($metadata);
