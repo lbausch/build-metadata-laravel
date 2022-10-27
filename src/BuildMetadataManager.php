@@ -46,6 +46,14 @@ class BuildMetadataManager
     }
 
     /**
+     * Determine whether build metadata are cached.
+     */
+    public function cached(): bool
+    {
+        return static::$cached;
+    }
+
+    /**
      * Cache build metadata.
      *
      * @throws ErrorException
