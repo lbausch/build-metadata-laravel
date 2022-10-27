@@ -20,4 +20,17 @@ abstract class TestCase extends BaseTestCase
             ServiceProvider::class,
         ];
     }
+
+    /**
+     * Define environment setup.
+     *
+     * @param \Illuminate\Foundation\Application $app
+     *
+     * @return void
+     */
+    protected function defineEnvironment($app)
+    {
+        $app['config']->set('build-metadata.cache.key', 'BUILD_METADATA');
+        $app['config']->set('build-metadata.file', 'build-metadata.json');
+    }
 }

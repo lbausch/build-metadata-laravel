@@ -2,19 +2,12 @@
 
 namespace Lbausch\BuildMetadataLaravel;
 
-use Carbon\Carbon;
-use Carbon\Exceptions\InvalidFormatException;
-use Illuminate\Cache\Repository;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Config\Repository;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
-    final public const BUILD_REF_FILE = 'BUILD_REF';
-    final public const BUILD_REF_CACHE_KEY = 'BUILD_REF';
-
-    final public const BUILD_DATE_FILE = 'BUILD_REF';
-    final public const BUILD_DATE_CACHE_KEY = 'BUILD_REF';
-
     /**
      * Register services.
      *
@@ -22,6 +15,10 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
+        // Merge config
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/build-metadata.php', 'build-metadata'
+        );
     }
 
     /**
@@ -29,28 +26,21 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
-    public function boot(Repository $cache)
+    public function boot(CacheManager $cacheManager, Repository $config)
     {
-        // Cache build reference
-        if (!$cache->has(static::BUILD_REF_CACHE_KEY) && file_exists(base_path(static::BUILD_REF_FILE))) {
-            $build_ref = trim(file_get_contents(base_path(static::BUILD_REF_FILE)));
+        // Publish configuration
+        $this->publishes([
+            __DIR__.'/../config/build-metadata.php' => config_path('build-metadata.php'),
+        ]);
 
-            $build_ref = substr($build_ref, 0, 8);
+        // Bind singleton
+        $this->app->singleton(BuildMetadata::class, function ($app) use ($cacheManager, $config) {
+            // Obtain a cache store instance
+            $cache = $cacheManager->store(
+                $config->get('build-metadata.cache.store')
+            );
 
-            $cache->forever(static::BUILD_REF_CACHE_KEY, $build_ref);
-        }
-
-        // Cache build date
-        if (!$cache->has(static::BUILD_DATE_CACHE_KEY) && file_exists(base_path(static::BUILD_DATE_FILE))) {
-            $build_date = trim(file_get_contents(base_path(static::BUILD_DATE_FILE)));
-
-            try {
-                $build_date = Carbon::createFromTimestamp($build_date, 'UTC');
-            } catch (InvalidFormatException) {
-                $build_date = null;
-            }
-
-            $cache->forever(static::BUILD_DATE_CACHE_KEY, $build_date);
-        }
+            return new BuildMetadata($cache, $config);
+        });
     }
 }
