@@ -40,9 +40,9 @@ class BuildMetadataManager
     /**
      * Get build metadata.
      */
-    public function getMetadata(): ?Metadata
+    public function getMetadata(): Metadata
     {
-        return $this->cache->get($this->cache_key);
+        return $this->cache->get($this->cache_key, new Metadata());
     }
 
     /**
