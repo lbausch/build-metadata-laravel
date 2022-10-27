@@ -34,13 +34,13 @@ class ServiceProvider extends BaseServiceProvider
         ]);
 
         // Bind singleton
-        $this->app->singleton(BuildMetadata::class, function ($app) use ($cacheManager, $config) {
+        $this->app->singleton(BuildMetadataManager::class, function ($app) use ($cacheManager, $config) {
             // Obtain a cache store instance
             $cache = $cacheManager->store(
                 $config->get('build-metadata.cache.store')
             );
 
-            return new BuildMetadata($cache, $config);
+            return new BuildMetadataManager($cache, $config);
         });
     }
 }

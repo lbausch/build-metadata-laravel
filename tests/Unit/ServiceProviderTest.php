@@ -25,7 +25,7 @@ final class ConfigTest extends TestCase
     /**
      * @covers \LBausch\BuildMetadataLaravel\ServiceProvider::boot
      * @covers \LBausch\BuildMetadataLaravel\ServiceProvider::register
-     * @covers \Lbausch\BuildMetadataLaravel\BuildMetadata::cache
+     * @covers \Lbausch\BuildMetadataLaravel\BuildMetadataManager::cache
      * @covers \Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata::__construct
      */
     public function test_service_provider_boots(): void

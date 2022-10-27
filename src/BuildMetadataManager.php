@@ -9,7 +9,7 @@ use InvalidArgumentException;
 use Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata;
 use Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata;
 
-class BuildMetadata
+class BuildMetadataManager
 {
     /**
      * Cache key.
