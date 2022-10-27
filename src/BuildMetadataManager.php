@@ -34,7 +34,10 @@ class BuildMetadataManager
     ) {
         $this->cache_key = trim((string) $this->config->get('build-metadata.cache.key'));
 
-        $this->cache();
+        // Avoid re-caching build metadata
+        if (!$this->cached()) {
+            $this->cache();
+        }
     }
 
     /**
@@ -50,6 +53,14 @@ class BuildMetadataManager
      */
     public function cached(): bool
     {
+        if (static::$cached) {
+            return true;
+        }
+
+        if ($this->cache->has($this->cache_key)) {
+            static::$cached = true;
+        }
+
         return static::$cached;
     }
 
@@ -61,13 +72,6 @@ class BuildMetadataManager
      */
     protected function cache(): void
     {
-        // Avoid re-caching build metadata
-        if (static::$cached || $this->cache->has($this->cache_key)) {
-            static::$cached = true;
-
-            return;
-        }
-
         // Verify a cache key is configured
         if (!$this->cache_key) {
             throw new InvalidArgumentException('Invalid cache key "'.$this->cache_key.'" provided');
