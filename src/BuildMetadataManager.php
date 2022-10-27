@@ -16,6 +16,11 @@ class BuildMetadataManager
      */
     protected string $cache_key;
 
+    /**
+     * Whether build metadata are cached.
+     */
+    protected static bool $cached = false;
+
     public function __construct(
         /**
          * Cache repository.
@@ -48,16 +53,16 @@ class BuildMetadataManager
      */
     protected function cache(): void
     {
+        // Avoid re-caching build metadata
+        if (static::$cached || $this->cache->has($this->cache_key)) {
+            static::$cached = true;
+
+            return;
+        }
+
         // Verify a cache key is configured
         if (!$this->cache_key) {
             throw new InvalidArgumentException('Invalid cache key "'.$this->cache_key.'" provided');
-        }
-
-        // Avoid re-caching build metadata
-        if ($this->cache->has($this->cache_key)) {
-            CachedBuildMetadata::dispatch($this->getMetadata());
-
-            return;
         }
 
         // Dispatch an event before caching build metadata
@@ -85,6 +90,8 @@ class BuildMetadataManager
 
         // Cache build metadata forever
         $this->cache->forever($this->cache_key, $metadata);
+
+        static::$cached = true;
 
         // Dispatch an event after caching build metadata
         CachedBuildMetadata::dispatch($metadata);
