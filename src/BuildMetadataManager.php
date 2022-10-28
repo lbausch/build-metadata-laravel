@@ -5,17 +5,21 @@ namespace Lbausch\BuildMetadataLaravel;
 use ErrorException;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata;
 use Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata;
 
-class BuildMetadata
+class BuildMetadataManager
 {
     /**
      * Cache key.
      */
     protected string $cache_key;
+
+    /**
+     * Whether build metadata are cached.
+     */
+    protected static bool $cached = false;
 
     public function __construct(
         /**
@@ -30,31 +34,34 @@ class BuildMetadata
     ) {
         $this->cache_key = trim((string) $this->config->get('build-metadata.cache.key'));
 
-        $this->cache();
+        // Avoid re-caching build metadata
+        if (!$this->cached()) {
+            $this->cache();
+        }
     }
 
     /**
      * Get build metadata.
      */
-    public function get(string $key = null, mixed $default = null): mixed
+    public function getMetadata(): Metadata
     {
-        $data = $this->cache->get($this->cache_key, []);
-
-        if (null === $key) {
-            return $data;
-        }
-
-        return Arr::get($data, $key, $default);
+        return $this->cache->get($this->cache_key, new Metadata());
     }
 
     /**
-     * Determine if an item exists in the build metadata.
+     * Determine whether build metadata are cached.
      */
-    public function has(string $key): bool
+    public function cached(): bool
     {
-        $data = $this->get();
+        if (static::$cached) {
+            return true;
+        }
 
-        return Arr::has($data, $key);
+        if ($this->cache->has($this->cache_key)) {
+            static::$cached = true;
+        }
+
+        return static::$cached;
     }
 
     /**
@@ -63,20 +70,11 @@ class BuildMetadata
      * @throws ErrorException
      * @throws InvalidArgumentException
      */
-    public function cache(): void
+    protected function cache(): void
     {
         // Verify a cache key is configured
-        $cache_key = trim((string) $this->config->get('build-metadata.cache.key'));
-
-        if (!$cache_key) {
-            throw new InvalidArgumentException('Invalid cache key "'.$cache_key.'" provided');
-        }
-
-        // Avoid re-caching build metadata
-        if ($this->cache->has($cache_key)) {
-            CachedBuildMetadata::dispatch($this->cache->get($cache_key));
-
-            return;
+        if (!$this->cache_key) {
+            throw new InvalidArgumentException('Invalid cache key "'.$this->cache_key.'" provided');
         }
 
         // Dispatch an event before caching build metadata
@@ -100,10 +98,12 @@ class BuildMetadata
         }
 
         // Try to parse JSON
-        $metadata = json_decode($metadata_raw, $associative = true, 512, JSON_THROW_ON_ERROR);
+        $metadata = Metadata::fromJson($metadata_raw);
 
         // Cache build metadata forever
-        $this->cache->forever($cache_key, $metadata);
+        $this->cache->forever($this->cache_key, $metadata);
+
+        static::$cached = true;
 
         // Dispatch an event after caching build metadata
         CachedBuildMetadata::dispatch($metadata);

@@ -6,6 +6,7 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Lbausch\BuildMetadataLaravel\Metadata;
 
 class CachedBuildMetadata
 {
@@ -22,7 +23,7 @@ class CachedBuildMetadata
         /**
          * Build metadata.
          */
-        public array $build_metadata
+        public Metadata $build_metadata
     ) {
     }
 
