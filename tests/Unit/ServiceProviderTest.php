@@ -7,7 +7,7 @@ use Illuminate\Config\Repository;
 use Lbausch\BuildMetadataLaravel\ServiceProvider;
 use Tests\TestCase;
 
-final class ConfigTest extends TestCase
+final class ServiceProviderTest extends TestCase
 {
     /**
      * Get package providers.
