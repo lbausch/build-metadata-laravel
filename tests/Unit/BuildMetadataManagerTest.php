@@ -12,6 +12,7 @@ final class BuildMetadataManagerTest extends TestCase
      * @covers \LBausch\BuildMetadataLaravel\ServiceProvider::register
      * @covers \Lbausch\BuildMetadataLaravel\ServiceProvider::boot
      * @covers \Lbausch\BuildMetadataLaravel\Console\Commands\SaveBuildMetadata::__construct
+     * @covers \Lbausch\BuildMetadataLaravel\Console\Commands\ClearBuildMetadata::__construct
      * @covers \Lbausch\BuildMetadataLaravel\Console\Commands\SaveBuildMetadata::handle
      * @covers \Lbausch\BuildMetadataLaravel\BuildMetadataManager::__construct
      * @covers \Lbausch\BuildMetadataLaravel\BuildMetadataManager::beforeCaching

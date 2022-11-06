@@ -21,23 +21,14 @@ class ClearBuildMetadata extends Command
      */
     protected $description = 'Forget cached build metadata';
 
-    public function __construct(
-        /**
-         * Config.
-         */
-        protected BuildMetadataManager $manager
-    ) {
-        parent::__construct();
-    }
-
     /**
      * Execute the console command.
      *
      * @return int
      */
-    public function handle()
+    public function handle(BuildMetadataManager $manager)
     {
-        $this->manager->forget();
+        $manager->forget();
 
         return Command::SUCCESS;
     }
