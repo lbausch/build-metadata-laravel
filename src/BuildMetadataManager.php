@@ -2,10 +2,8 @@
 
 namespace Lbausch\BuildMetadataLaravel;
 
-use ErrorException;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository as ConfigRepository;
-use InvalidArgumentException;
 use Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata;
 use Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata;
 
@@ -67,14 +65,14 @@ class BuildMetadataManager
     /**
      * Cache build metadata.
      *
-     * @throws ErrorException
-     * @throws InvalidArgumentException
+     * @throws \ErrorException
+     * @throws \InvalidArgumentException
      */
     protected function cache(): void
     {
         // Verify a cache key is configured
         if (!$this->cache_key) {
-            throw new InvalidArgumentException('Invalid cache key "'.$this->cache_key.'" provided');
+            throw new \InvalidArgumentException('Invalid cache key "'.$this->cache_key.'" provided');
         }
 
         // Dispatch an event before caching build metadata
@@ -94,7 +92,7 @@ class BuildMetadataManager
 
         // Verify build metadata were read
         if (false === $metadata_raw) {
-            throw new ErrorException('Failed to read build metadata from '.$file);
+            throw new \ErrorException('Failed to read build metadata from '.$file);
         }
 
         // Try to parse JSON
