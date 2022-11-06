@@ -144,5 +144,7 @@ class BuildMetadataManager
 
         // Forget build metadata
         $this->cache->forget($this->cache_key);
+
+        static::$cached = false;
     }
 }
