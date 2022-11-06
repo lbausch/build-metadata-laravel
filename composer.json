@@ -52,5 +52,8 @@
             "target-directory": "vendor-bin",
             "forward-command": true
         }
+    },
+    "suggest": {
+        "deployer/deployer": "Use the provided recipe with Deployer"
     }
 }
