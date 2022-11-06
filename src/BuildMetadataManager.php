@@ -81,13 +81,12 @@ class BuildMetadataManager
      * Cache build metadata.
      *
      * @throws \ErrorException
-     * @throws \InvalidArgumentException
      */
     protected function cache(): void
     {
         // Verify a cache key is configured
         if (!$this->cache_key) {
-            throw new \InvalidArgumentException('Invalid cache key "'.$this->cache_key.'" provided');
+            throw new \ErrorException('Invalid cache key "'.$this->cache_key.'" provided');
         }
 
         // Dispatch an event before caching build metadata
