@@ -130,4 +130,20 @@ class BuildMetadataManager
         // Dispatch an event after caching build metadata
         CachedBuildMetadata::dispatch($metadata);
     }
+
+    /**
+     * Forget cached build metadata.
+     *
+     * @throws \ErrorException
+     */
+    public function forget(): void
+    {
+        // Verify a cache key is configured
+        if (!$this->cache_key) {
+            throw new \ErrorException('Invalid cache key "'.$this->cache_key.'" provided');
+        }
+
+        // Forget build metadata
+        $this->cache->forget($this->cache_key);
+    }
 }
