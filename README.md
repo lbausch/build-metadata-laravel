@@ -2,13 +2,15 @@
 
 ![tests](https://github.com/lbausch/build-metadata-laravel/actions/workflows/tests.yml/badge.svg) ![codecov](https://codecov.io/gh/lbausch/build-metadata-laravel/branch/main/graph/badge.svg)
 
+Save arbitrary build metadata (commit SHA, build date, ...), deploy them along with your application and retrieve them at runtime when required.
+
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Configuration](#configuration)
   - [Saving Build Metadata](#saving-build-metadata)
   - [Deployer Recipe](#deployer-recipe)
-  - [Using Build Metadata](#using-build-metadata)
+  - [Using Build Metadata at Runtime](#using-build-metadata-at-runtime)
   - [Callbacks](#callbacks)
     - [beforeCaching](#beforecaching)
   - [Events](#events)
@@ -33,7 +35,7 @@ php artisan vendor:publish --provider=Lbausch\\BuildMetadataLaravel\\ServiceProv
 ```
 
 ### Saving Build Metadata
-When deploying your application, e.g. utilizing a CI/CD pipeline, you may save build metadata with the following command:
+When deploying your application, e.g. utilizing a CI/CD pipeline, the following command writes build metadata to the configured file:
 ```bash
 php artisan buildmetadata:save BUILD_REF=$CI_COMMIT_SHA BUILD_DATE=$(date +%s)
 ```
@@ -63,7 +65,7 @@ after('artisan:config:cache', 'buildmetadata:clear');
 // ...
 ```
 
-### Using Build Metadata
+### Using Build Metadata at Runtime
 In the following example build metadata are retrieved within a [view composer](https://laravel.com/docs/9.x/views#view-composers).
 
 ```php
@@ -109,6 +111,7 @@ class ViewServiceProvider extends ServiceProvider
 ### Callbacks
 
 #### beforeCaching
+This callback is executed before metadata are indefinitely cached and might be used to alter some of the data.
 
 ```php
 <?php
@@ -131,17 +134,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        // Register a callback which is executed before metadata are indefinitely cached
         BuildMetadataManager::beforeCaching(function (Metadata $metadata): Metadata {
             // Convert build date to a Carbon instance
             $build_date = $metadata->get('BUILD_DATE');
@@ -151,12 +143,24 @@ class AppServiceProvider extends ServiceProvider
             return $metadata;
         });
     }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        //
+    }
 }
 ```
 
 ### Events
 
 #### CachingBuildMetadata
+This event is dispatched right before build metadata will be cached.
+
 ```php
 <?php
 
@@ -177,13 +181,15 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         Event::listen(function(\Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata $event) {
-            // Dispatched right before build metadata will be cached
+            //
         });
     }
 }
 ```
 
 #### CachedBuildMetadata
+This event is dispatched after build metadata were cached. The cached build metadata are available on the event instance.
+
 ```php
 <?php
 
@@ -204,8 +210,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         Event::listen(function(\Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata $event) {
-            // Dispatched after metadata were cached
-
             $build_metadata = $event->build_metadata;
         });
     }
