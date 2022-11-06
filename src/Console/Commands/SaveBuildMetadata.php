@@ -4,6 +4,7 @@ namespace Lbausch\BuildMetadataLaravel\Console\Commands;
 
 use Illuminate\Config\Repository;
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 
 class SaveBuildMetadata extends Command
 {
@@ -38,7 +39,7 @@ class SaveBuildMetadata extends Command
     public function handle()
     {
         // Obtain metadata argument
-        $metadata_raw = $this->argument('metadata');
+        $metadata_raw = Arr::wrap($this->argument('metadata'));
 
         $metadata = [];
 
