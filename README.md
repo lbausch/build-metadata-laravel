@@ -11,6 +11,9 @@
   - [Using Build Metadata](#using-build-metadata)
   - [Callbacks](#callbacks)
     - [beforeCaching](#beforecaching)
+  - [Events](#events)
+    - [CachingBuildMetadata](#cachingbuildmetadata)
+    - [CachedBuildMetadata](#cachedbuildmetadata)
 
 ## Requirements
 + PHP 8.1+
@@ -145,3 +148,60 @@ class AppServiceProvider extends ServiceProvider
     }
 }
 ```
+
+### Events
+
+#### CachingBuildMetadata
+```php
+<?php
+
+// app/Providers/EventServiceProvider.php
+
+namespace App\Providers;
+
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
+
+class EventServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any events for your application.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        Event::listen(function(\Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata $event) {
+            // Dispatched right before build metadata will be read
+        });
+    }
+}
+```
+
+#### CachedBuildMetadata
+```php
+<?php
+
+// app/Providers/EventServiceProvider.php
+
+namespace App\Providers;
+
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
+
+class EventServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any events for your application.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        Event::listen(function(\Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata $event) {
+            // Dispatched after metadata were cached
+
+            $build_metadata = $event->build_metadata;
+        });
+    }
+}
