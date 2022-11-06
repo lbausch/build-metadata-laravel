@@ -30,6 +30,8 @@ class ClearBuildMetadata extends Command
     {
         $manager->forget();
 
+        $this->info('Build metadata have been cleared');
+
         return Command::SUCCESS;
     }
 }
