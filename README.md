@@ -22,7 +22,7 @@ composer require lbausch/build-metadata-laravel
 ## Usage
 
 ### Configuration
-If the default configuration doesn't suit your needs, you may publish the configuration file `config/build-metadata.php`:
+If the default configuration doesn't suit your needs, you may publish the [configuration file](config/build-metadata.php):
 ```bash
 php artisan vendor:publish --provider=Lbausch\\BuildMetadataLaravel\\ServiceProvider
 ```
