@@ -37,10 +37,13 @@ When deploying your application, e.g. utilizing a CI/CD pipeline, you may save b
 ```bash
 php artisan buildmetadata:save BUILD_REF=$CI_COMMIT_SHA BUILD_DATE=$(date +%s)
 ```
-Build metadata are indefinitely cached, so the application cache needs to be cleared during deployment.
+Build metadata are indefinitely cached, so either the application cache needs to be cleared during deployment or the following command may be used:
+```bash
+php artisan buildmetadata:clear
+```
 
 ### Deployer Recipe
-This package ships with a Deployer recipe which provides a task to upload the build metadata.
+This package ships with a Deployer recipe which provides tasks to handle the build metadata.
 
 ```php
 <?php
@@ -54,6 +57,8 @@ require 'vendor/lbausch/build-metadata-laravel/contrib/deployer/buildmetadata.ph
 // ...
 
 after('deploy:vendors', 'buildmetadata:deploy');
+
+after('artisan:config:cache', 'buildmetadata:clear');
 
 // ...
 ```
@@ -172,7 +177,7 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         Event::listen(function(\Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata $event) {
-            // Dispatched right before build metadata will be read
+            // Dispatched right before build metadata will be cached
         });
     }
 }
