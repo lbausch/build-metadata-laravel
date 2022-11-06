@@ -10,6 +10,13 @@ use Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata;
 class BuildMetadataManager
 {
     /**
+     * Callback which is executed before metadata are indefinitely cached.
+     *
+     * @var callable
+     */
+    protected static $beforeCachingCallback;
+
+    /**
      * Cache key.
      */
     protected string $cache_key;
@@ -63,6 +70,14 @@ class BuildMetadataManager
     }
 
     /**
+     * Register a callback which is executed before build metadata are indefinitely cached.
+     */
+    public static function beforeCaching(callable $callback): void
+    {
+        static::$beforeCachingCallback = $callback;
+    }
+
+    /**
      * Cache build metadata.
      *
      * @throws \ErrorException
@@ -97,6 +112,15 @@ class BuildMetadataManager
 
         // Try to parse JSON
         $metadata = Metadata::fromJson($metadata_raw);
+
+        // Execute callback
+        if (is_callable(static::$beforeCachingCallback)) {
+            $metadata = call_user_func_array(static::$beforeCachingCallback, [$metadata]);
+
+            if (!$metadata instanceof Metadata) {
+                throw new \ErrorException('beforeCaching callback did not return an instance of '.Metadata::class);
+            }
+        }
 
         // Cache build metadata forever
         $this->cache->forever($this->cache_key, $metadata);

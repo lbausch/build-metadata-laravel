@@ -9,6 +9,8 @@
   - [Saving Build Metadata](#saving-build-metadata)
   - [Deployer Recipe](#deployer-recipe)
   - [Using Build Metadata](#using-build-metadata)
+  - [Callbacks](#callbacks)
+    - [beforeCaching](#beforecaching)
 
 ## Requirements
 + PHP 8.1+
@@ -37,9 +39,10 @@ Build metadata are indefinitely cached, so the application cache needs to be cle
 ### Deployer Recipe
 This package ships with a Deployer recipe which provides a task to upload the build metadata.
 
-_`deploy.php`_
 ```php
 <?php
+
+// deploy.php
 
 namespace Deployer;
 
@@ -55,9 +58,10 @@ after('deploy:vendors', 'buildmetadata:deploy');
 ### Using Build Metadata
 In the following example build metadata are retrieved within a [view composer](https://laravel.com/docs/9.x/views#view-composers).
 
-_`app/Providers/ViewServiceProvider.php`_
 ```php
 <?php
+
+// app/Providers/ViewServiceProvider.php
 
 namespace App\Providers;
 
@@ -88,6 +92,55 @@ class ViewServiceProvider extends ServiceProvider
 
         View::composer('*', function ($view) use ($metadata) {
             $view->with('BUILD_REF', $metadata->get('BUILD_REF', 'n/a'));
+        });
+    }
+}
+```
+
+
+### Callbacks
+
+#### beforeCaching
+
+```php
+<?php
+
+// app/Providers/AppServiceProvider.php
+
+namespace App\Providers;
+
+use Carbon\Carbon;
+use Illuminate\Support\ServiceProvider;
+use Lbausch\BuildMetadataLaravel\BuildMetadataManager;
+use Lbausch\BuildMetadataLaravel\Metadata;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        // Register a callback which is executed before metadata are indefinitely cached
+        BuildMetadataManager::beforeCaching(function (Metadata $metadata): Metadata {
+            // Convert build date to a Carbon instance
+            $build_date = $metadata->get('BUILD_DATE');
+
+            $metadata->set('BUILD_DATE', Carbon::createFromTimestampUTC($build_date));
+
+            return $metadata;
         });
     }
 }

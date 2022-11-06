@@ -45,4 +45,12 @@ class Metadata
 
         return Arr::has($data, $key);
     }
+
+    /**
+     * Set metadata.
+     */
+    public function set(string $key, mixed $value): void
+    {
+        Arr::set($this->metadata, $key, $value);
+    }
 }
