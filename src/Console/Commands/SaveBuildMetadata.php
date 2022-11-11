@@ -4,6 +4,7 @@ namespace Lbausch\BuildMetadataLaravel\Console\Commands;
 
 use Illuminate\Config\Repository;
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 
 class SaveBuildMetadata extends Command
 {
@@ -21,24 +22,15 @@ class SaveBuildMetadata extends Command
      */
     protected $description = 'Save build metadata';
 
-    public function __construct(
-        /**
-         * Config.
-         */
-        protected Repository $config
-    ) {
-        parent::__construct();
-    }
-
     /**
      * Execute the console command.
      *
      * @return int
      */
-    public function handle()
+    public function handle(Repository $config)
     {
         // Obtain metadata argument
-        $metadata_raw = $this->argument('metadata');
+        $metadata_raw = Arr::wrap($this->argument('metadata'));
 
         $metadata = [];
 
@@ -60,7 +52,7 @@ class SaveBuildMetadata extends Command
         }
 
         // Read destination file from config
-        $metadata_file = $this->config->get('build-metadata.file');
+        $metadata_file = $config->get('build-metadata.file');
 
         // Save build metadata as JSON to file
         $this->info('Saving build metadata to '.$metadata_file);

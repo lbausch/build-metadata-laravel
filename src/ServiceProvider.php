@@ -5,6 +5,7 @@ namespace Lbausch\BuildMetadataLaravel;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use Lbausch\BuildMetadataLaravel\Console\Commands\ClearBuildMetadata;
 use Lbausch\BuildMetadataLaravel\Console\Commands\SaveBuildMetadata;
 
 class ServiceProvider extends BaseServiceProvider
@@ -47,6 +48,7 @@ class ServiceProvider extends BaseServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 SaveBuildMetadata::class,
+                ClearBuildMetadata::class,
             ]);
         }
     }
