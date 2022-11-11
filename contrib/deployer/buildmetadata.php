@@ -8,6 +8,5 @@ task('buildmetadata:deploy', function () {
     upload('{{buildmetadata_file}}', '{{release_path}}');
 })->desc('Deploy build metadata');
 
-task('buildmetadata:clear', function () {
-    artisan('buildmetadata:clear', ['showOutput']);
-})->desc('Forget cached build metadata');
+task('buildmetadata:clear', artisan('buildmetadata:clear', ['showOutput']))
+->desc('Forget cached build metadata');
