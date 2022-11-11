@@ -9,5 +9,5 @@ task('buildmetadata:deploy', function () {
 })->desc('Deploy build metadata');
 
 task('buildmetadata:clear', function () {
-    artisan('buildmetadata:clear');
+    artisan('buildmetadata:clear', ['showOutput']);
 })->desc('Forget cached build metadata');
