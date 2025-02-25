@@ -19,7 +19,7 @@ Save arbitrary build metadata (commit SHA, build date, ...), deploy them along w
 
 ## Requirements
 + PHP 8.3+
-+ Laravel 9+
++ Laravel 12+
 
 ## Installation
 ```bash
