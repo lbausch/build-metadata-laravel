@@ -66,7 +66,7 @@ after('artisan:config:cache', 'buildmetadata:clear');
 ```
 
 ### Using Build Metadata at Runtime
-In the following example build metadata are retrieved within a [view composer](https://laravel.com/docs/9.x/views#view-composers).
+In the following example build metadata are retrieved within a [view composer](https://laravel.com/docs/master/views#view-composers).
 
 ```php
 <?php
