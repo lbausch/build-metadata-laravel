@@ -18,7 +18,7 @@ Save arbitrary build metadata (commit SHA, build date, ...), deploy them along w
     - [CachedBuildMetadata](#cachedbuildmetadata)
 
 ## Requirements
-+ PHP 8.1+
++ PHP 8.3+
 + Laravel 9+
 
 ## Installation

@@ -27,7 +27,7 @@ class Metadata
     /**
      * Get metadata.
      */
-    public function get(string $key = null, mixed $default = null): mixed
+    public function get(?string $key = null, mixed $default = null): mixed
     {
         if (null === $key) {
             return $this->metadata;

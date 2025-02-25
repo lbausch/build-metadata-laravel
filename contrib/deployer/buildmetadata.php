@@ -4,7 +4,7 @@ namespace Deployer;
 
 set('buildmetadata_file', 'build-metadata.json');
 
-task('buildmetadata:deploy', function () {
+task('buildmetadata:deploy', function (): void {
     upload('{{buildmetadata_file}}', '{{release_path}}');
 })->desc('Deploy build metadata');
 

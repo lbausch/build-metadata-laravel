@@ -15,6 +15,7 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
+    #[\Override]
     public function register()
     {
         // Merge config
