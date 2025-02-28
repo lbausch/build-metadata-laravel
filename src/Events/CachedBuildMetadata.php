@@ -23,7 +23,7 @@ class CachedBuildMetadata
         /**
          * Build metadata.
          */
-        public Metadata $build_metadata
+        public Metadata $build_metadata,
     ) {
     }
 

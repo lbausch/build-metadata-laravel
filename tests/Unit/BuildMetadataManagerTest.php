@@ -4,28 +4,19 @@ namespace Tests\Unit;
 
 use Lbausch\BuildMetadataLaravel\BuildMetadataManager;
 use Lbausch\BuildMetadataLaravel\Metadata;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
+#[CoversClass(BuildMetadataManager::class)]
+#[CoversClass(Metadata::class)]
+#[CoversClass(\LBausch\BuildMetadataLaravel\ServiceProvider::class)]
+#[CoversClass(\Lbausch\BuildMetadataLaravel\Console\Commands\SaveBuildMetadata::class)]
+#[CoversClass(\Lbausch\BuildMetadataLaravel\Console\Commands\ClearBuildMetadata::class)]
+#[CoversClass(\Lbausch\BuildMetadataLaravel\Console\Commands\SaveBuildMetadata::class)]
+#[CoversClass(\Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata::class)]
+#[CoversClass(\Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata::class)]
 final class BuildMetadataManagerTest extends TestCase
 {
-    /**
-     * @covers \LBausch\BuildMetadataLaravel\ServiceProvider::register
-     * @covers \Lbausch\BuildMetadataLaravel\ServiceProvider::boot
-     * @covers \Lbausch\BuildMetadataLaravel\Console\Commands\SaveBuildMetadata::__construct
-     * @covers \Lbausch\BuildMetadataLaravel\Console\Commands\ClearBuildMetadata::__construct
-     * @covers \Lbausch\BuildMetadataLaravel\Console\Commands\SaveBuildMetadata::handle
-     * @covers \Lbausch\BuildMetadataLaravel\BuildMetadataManager::__construct
-     * @covers \Lbausch\BuildMetadataLaravel\BuildMetadataManager::beforeCaching
-     * @covers \Lbausch\BuildMetadataLaravel\BuildMetadataManager::cache
-     * @covers \Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata::__construct
-     * @covers \Lbausch\BuildMetadataLaravel\Metadata::fromJson
-     * @covers \Lbausch\BuildMetadataLaravel\Metadata::__construct
-     * @covers \Lbausch\BuildMetadataLaravel\Metadata::get
-     * @covers \Lbausch\BuildMetadataLaravel\Metadata::set
-     * @covers \Lbausch\BuildMetadataLaravel\BuildMetadataManager::cached
-     * @covers \Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata::__construct
-     * @covers \Lbausch\BuildMetadataLaravel\BuildMetadataManager::getMetadata
-     */
     public function test_callback_is_called(): void
     {
         $this->artisan('buildmetadata:save', ['metadata' => 'FOO=bar']);

@@ -5,8 +5,12 @@ namespace Tests\Unit;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository;
 use Lbausch\BuildMetadataLaravel\ServiceProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
+#[CoversClass(ServiceProvider::class)]
+#[CoversClass(\Lbausch\BuildMetadataLaravel\BuildMetadataManager::class)]
+#[CoversClass(\Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata::class)]
 final class ServiceProviderTest extends TestCase
 {
     /**
@@ -16,18 +20,13 @@ final class ServiceProviderTest extends TestCase
      *
      * @return array<int, string>
      */
+    #[\Override]
     protected function getPackageProviders($app)
     {
         // Disable automatic loading of service provider
         return [];
     }
 
-    /**
-     * @covers \LBausch\BuildMetadataLaravel\ServiceProvider::boot
-     * @covers \LBausch\BuildMetadataLaravel\ServiceProvider::register
-     * @covers \Lbausch\BuildMetadataLaravel\BuildMetadataManager::cache
-     * @covers \Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata::__construct
-     */
     public function test_service_provider_boots(): void
     {
         $cacheManager = $this->app->make(CacheManager::class);
