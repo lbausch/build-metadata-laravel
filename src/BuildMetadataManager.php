@@ -50,7 +50,7 @@ class BuildMetadataManager
      */
     public function getMetadata(): Metadata
     {
-        return $this->cache->get($this->cache_key, new Metadata());
+        return new Metadata($this->cache->get($this->cache_key, []));
     }
 
     /**
@@ -122,7 +122,7 @@ class BuildMetadataManager
         }
 
         // Cache build metadata forever
-        $this->cache->forever($this->cache_key, $metadata);
+        $this->cache->forever($this->cache_key, $metadata->get());
 
         static::$cached = true;
 
