@@ -17,6 +17,13 @@ class BuildMetadataManager
     protected static $beforeCachingCallback;
 
     /**
+     * Callback which is executed after build metadata were retrieved from cache.
+     *
+     * @var callable
+     */
+    protected static $afterRetrievingCallback;
+
+    /**
      * Cache key.
      */
     protected string $cache_key;
@@ -50,7 +57,17 @@ class BuildMetadataManager
      */
     public function getMetadata(): Metadata
     {
-        return new Metadata($this->cache->get($this->cache_key, []));
+        $metadata = new Metadata($this->cache->get($this->cache_key, []));
+
+        if (is_callable(static::$afterRetrievingCallback)) {
+            $metadata = call_user_func_array(static::$afterRetrievingCallback, [$metadata]);
+
+            if (!$metadata instanceof Metadata) {
+                throw new \ErrorException('afterRetrieving callback did not return an instance of '.Metadata::class);
+            }
+        }
+
+        return $metadata;
     }
 
     /**
@@ -75,6 +92,14 @@ class BuildMetadataManager
     public static function beforeCaching(callable $callback): void
     {
         static::$beforeCachingCallback = $callback;
+    }
+
+    /**
+     * Register a callback which is executed after build metadata were retrieved from cache.
+     */
+    public static function afterRetrieving(callable $callback): void
+    {
+        static::$afterRetrievingCallback = $callback;
     }
 
     /**

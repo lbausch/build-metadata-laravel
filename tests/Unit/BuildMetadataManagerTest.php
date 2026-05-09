@@ -16,7 +16,7 @@ use Tests\TestCase;
 #[CoversClass(\Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata::class)]
 final class BuildMetadataManagerTest extends TestCase
 {
-    public function test_callback_is_called(): void
+    public function test_before_caching_callback_is_called(): void
     {
         $this->artisan('buildmetadata:save', ['metadata' => 'FOO=bar']);
 
@@ -37,5 +37,29 @@ final class BuildMetadataManagerTest extends TestCase
         $this->assertTrue($callback_was_called);
 
         $this->assertSame('bar', $metadata->get('FOO'));
+    }
+
+    public function test_after_retrieving_callback_is_called(): void
+    {
+        // Ensure metadata is in cache
+        $this->artisan('buildmetadata:save', ['metadata' => 'FOO=bar']);
+
+        $manager = $this->app->make(BuildMetadataManager::class);
+
+        $callback_was_called = false;
+
+        BuildMetadataManager::afterRetrieving(function (Metadata $metadata) use (&$callback_was_called): Metadata {
+            $callback_was_called = true;
+
+            $metadata->set('AFTER', 'retrieved');
+
+            return $metadata;
+        });
+
+        $metadata = $manager->getMetadata();
+
+        $this->assertTrue($callback_was_called);
+
+        $this->assertSame('retrieved', $metadata->get('AFTER'));
     }
 }
