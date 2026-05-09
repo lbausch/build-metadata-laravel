@@ -12,7 +12,6 @@ use Tests\TestCase;
 #[CoversClass(\LBausch\BuildMetadataLaravel\ServiceProvider::class)]
 #[CoversClass(\Lbausch\BuildMetadataLaravel\Console\Commands\SaveBuildMetadata::class)]
 #[CoversClass(\Lbausch\BuildMetadataLaravel\Console\Commands\ClearBuildMetadata::class)]
-#[CoversClass(\Lbausch\BuildMetadataLaravel\Console\Commands\SaveBuildMetadata::class)]
 #[CoversClass(\Lbausch\BuildMetadataLaravel\Events\CachingBuildMetadata::class)]
 #[CoversClass(\Lbausch\BuildMetadataLaravel\Events\CachedBuildMetadata::class)]
 final class BuildMetadataManagerTest extends TestCase
