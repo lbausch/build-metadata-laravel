@@ -44,7 +44,7 @@ jobs:
         run: XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover coverage.xml
 
       - name: Upload coverage to Codecov
-        if: ${{ github.ref == 'refs/heads/main' && matrix.php == '8.1' && matrix.stability == 'prefer-stable' }}
-        uses: codecov/codecov-action@v3
+        if: ${{ github.ref == 'refs/heads/main' && matrix.php == '8.3' && matrix.stability == 'prefer-stable' }}
+        uses: codecov/codecov-action@v6
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
