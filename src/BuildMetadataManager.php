@@ -47,7 +47,7 @@ class BuildMetadataManager
         $this->cache_key = trim((string) $this->config->get('build-metadata.cache.key'));
 
         // Avoid re-caching build metadata
-        if (!$this->cached()) {
+        if (!$this->isCached()) {
             $this->cache();
         }
     }
@@ -73,7 +73,7 @@ class BuildMetadataManager
     /**
      * Determine whether build metadata are cached.
      */
-    public function cached(): bool
+    public function isCached(): bool
     {
         if (static::$cached) {
             return true;
