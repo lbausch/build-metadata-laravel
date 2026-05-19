@@ -17,6 +17,13 @@ class BuildMetadataManager
     protected static $beforeCachingCallback;
 
     /**
+     * Callback which is executed after build metadata were retrieved from cache.
+     *
+     * @var callable
+     */
+    protected static $afterRetrievingCallback;
+
+    /**
      * Cache key.
      */
     protected string $cache_key;
@@ -40,7 +47,7 @@ class BuildMetadataManager
         $this->cache_key = trim((string) $this->config->get('build-metadata.cache.key'));
 
         // Avoid re-caching build metadata
-        if (!$this->cached()) {
+        if (!$this->isCached()) {
             $this->cache();
         }
     }
@@ -50,13 +57,23 @@ class BuildMetadataManager
      */
     public function getMetadata(): Metadata
     {
-        return $this->cache->get($this->cache_key, new Metadata());
+        $metadata = new Metadata($this->cache->get($this->cache_key, []));
+
+        if (is_callable(static::$afterRetrievingCallback)) {
+            $metadata = call_user_func_array(static::$afterRetrievingCallback, [$metadata]);
+
+            if (!$metadata instanceof Metadata) {
+                throw new \ErrorException('afterRetrieving callback did not return an instance of '.Metadata::class);
+            }
+        }
+
+        return $metadata;
     }
 
     /**
      * Determine whether build metadata are cached.
      */
-    public function cached(): bool
+    public function isCached(): bool
     {
         if (static::$cached) {
             return true;
@@ -75,6 +92,14 @@ class BuildMetadataManager
     public static function beforeCaching(callable $callback): void
     {
         static::$beforeCachingCallback = $callback;
+    }
+
+    /**
+     * Register a callback which is executed after build metadata were retrieved from cache.
+     */
+    public static function afterRetrieving(callable $callback): void
+    {
+        static::$afterRetrievingCallback = $callback;
     }
 
     /**
@@ -122,7 +147,7 @@ class BuildMetadataManager
         }
 
         // Cache build metadata forever
-        $this->cache->forever($this->cache_key, $metadata);
+        $this->cache->forever($this->cache_key, $metadata->get());
 
         static::$cached = true;
 

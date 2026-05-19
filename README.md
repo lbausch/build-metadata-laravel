@@ -13,6 +13,7 @@ Save arbitrary build metadata (commit SHA, build date, ...), deploy them along w
   - [Using Build Metadata at Runtime](#using-build-metadata-at-runtime)
   - [Callbacks](#callbacks)
     - [beforeCaching](#beforecaching)
+    - [afterRetrieving](#afterretrieving)
   - [Events](#events)
     - [CachingBuildMetadata](#cachingbuildmetadata)
     - [CachedBuildMetadata](#cachedbuildmetadata)
@@ -139,6 +140,54 @@ class AppServiceProvider extends ServiceProvider
             $build_date = $metadata->get('BUILD_DATE');
 
             $metadata->set('BUILD_DATE', Carbon::createFromTimestampUTC($build_date));
+
+            return $metadata;
+        });
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        //
+    }
+}
+```
+
+#### afterRetrieving
+This callback is executed after metadata were retrieved from cache and might be used to alter some of the data.
+
+```php
+<?php
+
+// app/Providers/AppServiceProvider.php
+
+namespace App\Providers;
+
+use Carbon\Carbon;
+use Illuminate\Support\ServiceProvider;
+use Lbausch\BuildMetadataLaravel\BuildMetadataManager;
+use Lbausch\BuildMetadataLaravel\Metadata;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        BuildMetadataManager::afterRetrieving(function (Metadata $metadata): Metadata {
+            // Convert build date to a Carbon instance
+            if ($metadata->has('BUILD_DATE')) {
+                $build_date = $metadata->get('BUILD_DATE');
+
+                $metadata->set('BUILD_DATE', Carbon::createFromTimestampUTC($build_date));
+            }
 
             return $metadata;
         });
